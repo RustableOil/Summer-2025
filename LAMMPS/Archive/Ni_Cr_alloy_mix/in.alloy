@@ -1,0 +1,65 @@
+dimension 3
+
+units metal
+boundary p p p
+atom_style atomic
+neighbor 2 bin
+neigh_modify	one 1000
+
+region box block -14 14 -10 10 -10 10
+create_box 3 box
+
+lattice fcc 3.52
+
+region  nickel block -10 -0.5 -10 10 -10 10
+create_atoms 1 region nickel
+
+lattice bcc 2.87
+
+region chromium block 0 10 -10 10 -10 10
+create_atoms 2 region chromium
+
+mass 1 58.69
+mass 2 52.0
+mass 3 50
+
+pair_style  meam
+pair_coeff   * * library.meam Ni Cr NiCr.meam Ni Ni Cr
+
+fix 1 all npt temp 10.0 1500.0 $(100.0*dt) iso 0 0 $(10000.0*dt)
+
+
+timestep    0.005
+thermo 200
+thermo_modify lost ignore
+
+dump 	1 all xyz 25 out.xyz
+
+#dump 	2 	all image 50 image.*.jpg type type &
+#		zoom 1.0 adiam 1.5
+
+#dump    3   all movie 25 movie.mpg type type &
+#		zoom 1.0 adiam 1.5
+
+run 10000
+
+lattice hcp 0.9
+
+region  ni-slab block INF -12 INF INF INF INF
+region  cr-slab block 12 INF INF INF INF INF
+
+group   ni-slab region ni-slab
+group   cr-slab region cr-slab
+
+set group ni-slab type 3
+set group cr-slab type 3
+
+velocity ni-slab set 10 0 0 sum yes
+velocity cr-slab set -10 0 0 sum yes
+
+fix 1 all npt temp 1500.0 10.0 $(100.0*dt) iso 0 0 $(1000.0*dt)
+fix		2 ni-slab setforce 0.0 0.0 0.0
+fix		3 cr-slab setforce 0.0 0.0 0.0
+
+
+run 10000

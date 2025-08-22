@@ -1,0 +1,191 @@
+LAMMPS (29 Aug 2024 - Update 2)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+dimension 3
+
+units metal
+boundary p p p
+atom_style atomic
+neighbor 2 bin
+neigh_modify	one 1000
+
+region box block -14 14 -10 10 -10 10
+create_box 3 box
+Created orthogonal box = (-14 -10 -10) to (14 10 10)
+  2 by 2 by 2 MPI processor grid
+
+lattice fcc 3.52
+Lattice spacing in x,y,z = 3.52 3.52 3.52
+
+region  nickel block -10 -0.5 -10 10 -10 10
+create_atoms 1 region nickel
+Created 423 atoms
+  using lattice units in orthogonal box = (-14 -10 -10) to (14 10 10)
+  create_atoms CPU = 0.000 seconds
+
+lattice bcc 2.87
+Lattice spacing in x,y,z = 2.87 2.87 2.87
+
+region chromium block 0 10 -10 10 -10 10
+create_atoms 2 region chromium
+Created 425 atoms
+  using lattice units in orthogonal box = (-14 -10 -10) to (14 10 10)
+  create_atoms CPU = 0.000 seconds
+
+mass 1 58.69
+mass 2 52.0
+mass 3 50
+
+pair_style  meam
+pair_coeff   * * library.meam Ni Cr NiCr.meam Ni Ni Cr
+Reading MEAM library file library.meam with DATE: 2012-06-29
+
+fix 1 all npt temp 10.0 1500.0 $(100.0*dt) iso 0 0 $(10000.0*dt)
+fix 1 all npt temp 10.0 1500.0 0.10000000000000000555 iso 0 0 $(10000.0*dt)
+fix 1 all npt temp 10.0 1500.0 0.10000000000000000555 iso 0 0 10
+
+
+timestep    0.005
+thermo 200
+thermo_modify lost ignore
+
+dump 	1 all xyz 25 out.xyz
+
+#dump 	2 	all image 50 image.*.jpg type type #		zoom 1.0 adiam 1.5
+
+#dump    3   all movie 25 movie.mpg type type #		zoom 1.0 adiam 1.5
+
+run 10000
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 1000, page size: 100000
+  master list distance cutoff = 7
+  ghost atom cutoff = 7
+  binsize = 3.5, bins = 8 6 6
+  2 neighbor lists, perpetual/occasional/extra = 2 0 0
+  (1) pair meam, perpetual
+      attributes: full, newton on
+      pair build: full/bin/atomonly
+      stencil: full/bin/3d
+      bin: standard
+  (2) pair meam, perpetual, half/full from (1)
+      attributes: half, newton on
+      pair build: halffull/newton
+      stencil: none
+      bin: none
+Per MPI rank memory allocation (min/avg/max) = 8.992 | 9.015 | 9.046 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
+         0   0             -3453.9066      0             -3453.9066     -64066.671      11200        
+       200   37.108168     -3583.2248      0             -3579.1621     -4018.9945      10335.682    
+       400   81.096662     -3580.5977      0             -3571.7189     -5319.8951      10360.26     
+       600   84.450746     -3579.6213      0             -3570.3754     -1090.0314      10335.392    
+       800   140.50245     -3574.291       0             -3558.9083     -2702.2927      10397.06     
+      1000   155.83004     -3573.6679      0             -3556.6071      2361.8586      10309.574    
+      1200   226.14539     -3581.3943      0             -3556.6352     -5218.6417      10185.571    
+      1400   189.28049     -3637.1632      0             -3616.4401      372.4766       9796.1626    
+      1600   270.26739     -3631.2724      0             -3601.6826      857.92783      9782.9797    
+      1800   249.20457     -3634.4056      0             -3607.1219     -1512.6279      9777.0593    
+      2000   320.49593     -3627.7887      0             -3592.6997     -1267.6594      9775.0806    
+      2200   321.91445     -3629.3559      0             -3594.1116      3487.6035      9737.1679    
+      2400   363.16417     -3624.0928      0             -3584.3323      3576.6298      9752.8611    
+      2600   394.95992     -3623.6568      0             -3580.4153     -2579.8786      9795.9436    
+      2800   424.34379     -3619.9561      0             -3573.4975     -1351.8982      9793.1538    
+      3000   465.06934     -3617.7474      0             -3566.83       -4580.5061      9819.2155    
+      3200   483.674       -3619.8581      0             -3566.9039      2990.2978      9764.2124    
+      3400   531.37151     -3618.0532      0             -3559.8769     -6485.1946      9833.1565    
+      3600   542.25891     -3613.4653      0             -3554.097      -5321.7014      9847.0144    
+      3800   587.53052     -3613.9048      0             -3549.58       -2191.5364      9824.9264    
+      4000   606.39218     -3605.1031      0             -3538.7133      970.55594      9815.103     
+      4200   624.18274     -3603.635       0             -3535.2974     -1729.8085      9844.2362    
+      4400   682.50952     -3601.9401      0             -3527.2167      2456.1628      9831.2233    
+      4600   706.17197     -3600.7406      0             -3523.4265      7296.7261      9803.5201    
+      4800   763.3633      -3598.0572      0             -3514.4817      5994.4917      9813.2646    
+      5000   743.03011     -3594.7365      0             -3513.3871     -673.37676      9843.5207    
+      5200   782.12763     -3592.0729      0             -3506.443      -834.12991      9871.7267    
+      5400   811.01515     -3588.7745      0             -3499.9818     -4917.4331      9900.6635    
+      5600   804.02656     -3588.0019      0             -3499.9743     -5453.463       9898.6831    
+      5800   925.70731     -3585.7256      0             -3484.3761     -3961.2946      9900.2695    
+      6000   872.09339     -3586.0528      0             -3490.5731     -620.8807       9871.4581    
+      6200   977.40519     -3579.3224      0             -3472.3128      2552.9243      9870.825     
+      6400   965.64112     -3579.7741      0             -3474.0525     -2945.7381      9913.2026    
+      6600   991.93923     -3572.1468      0             -3463.546       308.25068      9921.1192    
+      6800   1032.0889     -3571.1005      0             -3458.1039      1153.3859      9921.7013    
+      7000   1037.7918     -3567.6651      0             -3454.0442      4710.6817      9900.8254    
+      7200   1093.9457     -3563.8879      0             -3444.1191      7846.9579      9886.8579    
+      7400   1118.5294     -3556.4499      0             -3433.9895      788.69285      9958.9429    
+      7600   1148.1014     -3557.4559      0             -3431.7579     -1020.7208      9964.1913    
+      7800   1174.5199     -3553.1651      0             -3424.5748     -6259.5439      10005.89     
+      8000   1208.3891     -3544.1467      0             -3411.8482     -5312.5782      10026.994    
+      8200   1198.2247     -3545.1748      0             -3413.9892     -5447.8899      10044.669    
+      8400   1219.4706     -3534.6716      0             -3401.1598     -6342.2691      10059.952    
+      8600   1266.6734     -3531.691       0             -3393.0114      41.613718      10049.958    
+      8800   1319.7406     -3530.0877      0             -3385.5981     -838.31961      10054.319    
+      9000   1329.9135     -3518.6702      0             -3373.0668      1178.1821      10080.398    
+      9200   1379.4914     -3504.5986      0             -3353.5673     -1336.4487      10153.628    
+      9400   1443.5328     -3513.0343      0             -3354.9915     -7978.798       10148.201    
+      9600   1385.6653     -3491.9389      0             -3340.2317     -8991.5727      10227.575    
+      9800   1432.1063     -3499.0857      0             -3342.2939     -3548.2337      10184.518    
+     10000   1434.3804     -3496.6979      0             -3339.6572     -2003.0371      10172.671    
+Loop time of 29.217 on 8 procs for 10000 steps with 848 atoms
+
+Performance: 147.859 ns/day, 0.162 hours/ns, 342.267 timesteps/s, 290.242 katom-step/s
+96.2% CPU use with 8 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 27.596     | 27.893     | 28.188     |   4.1 | 95.47
+Neigh   | 0.13642    | 0.13977    | 0.14423    |   0.7 |  0.48
+Comm    | 0.65991    | 0.95382    | 1.2577     |  22.4 |  3.26
+Output  | 0.033108   | 0.048061   | 0.057902   |   3.4 |  0.16
+Modify  | 0.12623    | 0.13735    | 0.14933    |   1.9 |  0.47
+Other   |            | 0.04532    |            |       |  0.16
+
+Nlocal:            106 ave         110 max         103 min
+Histogram: 3 0 1 0 0 2 0 0 0 2
+Nghost:        1187.38 ave        1202 max        1170 min
+Histogram: 1 0 2 0 1 0 1 1 0 2
+Neighs:        6524.12 ave        7129 max        6042 min
+Histogram: 2 1 1 0 0 1 0 1 0 2
+FullNghs:      13048.2 ave       14159 max       12064 min
+Histogram: 2 1 1 0 0 1 0 1 0 2
+
+Total # of neighbors = 104386
+Ave neighs/atom = 123.0967
+Neighbor list builds = 322
+Dangerous builds = 0
+
+lattice hcp 0.9
+Lattice spacing in x,y,z = 0.9 1.5588457 1.4696938
+
+region  ni-slab block INF -12 INF INF INF INF
+region  cr-slab block 12 INF INF INF INF INF
+
+group   ni-slab region ni-slab
+97 atoms in group ni-slab
+group   cr-slab region cr-slab
+70 atoms in group cr-slab
+
+set group ni-slab type 3
+Setting atom values ...
+  97 settings made for type
+set group cr-slab type 3
+Setting atom values ...
+  70 settings made for type
+
+fix 4 ni-slab rigid/nve single
+  1 rigid bodies with 97 atoms
+
+velocity ni-slab set 10 0 0 sum yes
+velocity cr-slab set -10 0 0 sum yes
+
+fix 1 all npt temp 1500.0 10.0 $(100.0*dt) iso 0 0 $(1000.0*dt)
+fix 1 all npt temp 1500.0 10.0 0.5 iso 0 0 $(1000.0*dt)
+fix 1 all npt temp 1500.0 10.0 0.5 iso 0 0 5
+fix		2 ni-slab setforce 0.0 0.0 0.0
+fix		3 cr-slab setforce 0.0 0.0 0.0
+
+
+run 10000
+ERROR: Rigid fixes must come before any box changing fix (src/RIGID/fix_rigid.cpp:739)
+Last command: run 10000

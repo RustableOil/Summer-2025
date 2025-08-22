@@ -1,0 +1,25 @@
+dimension 3
+
+units metal
+boundary p p p
+atom_style atomic
+neighbor 2 bin
+neigh_modify	one 1000
+
+lattice fcc 3.52
+
+region  box block -4 4 -4 4 -4 4
+create_box 1 box
+create_atoms 1 box
+create_atoms 1 single 0 -2.485 0
+
+mass 1 58.69
+
+min_style cg
+minimize 1e-15 1e-15 5000 5000
+
+dump 2 all atom 1 interm.atom
+
+run 1
+
+undump 2

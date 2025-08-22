@@ -1,0 +1,35 @@
+dimension 3
+
+units metal
+boundary p p p
+atom_style atomic
+neighbor 2 bin
+neigh_modify	one 1000
+
+lattice fcc 3.52
+
+region  box block -4 4 -4 4 -4 4
+create_box 1 box
+
+read_dump interm.atom 1 x y z box yes add yes format native
+
+mass 1 58.69
+
+pair_style   eam/alloy
+pair_coeff   * * Ni_v6_2.0_LKBeland2016.eam Ni
+
+fix 1 all nvt temp 10.0 2000.0 $(250.0*dt)
+
+timestep    0.001
+thermo 200
+thermo_modify lost ignore
+
+dump 	1 all xyz 25 out.xyz
+
+#dump 	2 	all image 50 image.*.jpg type type &
+#		zoom 1.0 adiam 1.5
+
+#dump    3   all movie 25 movie.mpg type type &
+#		zoom 1.0 adiam 1.5
+
+run 10000

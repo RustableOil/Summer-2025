@@ -1,0 +1,37 @@
+dimension 3
+boundary p p p
+
+units metal
+atom_style atomic
+
+lattice fcc 3.52
+
+region  box block 0 8 0 8 0 8
+
+create_box 3 box
+
+pair_style eam/alloy
+pair_coeff  * * FeNiCr_ArturV3.eam Ni Fe Cr
+
+mass 1 58.69
+mass 2 55.85
+mass 3 52.00
+
+group Ni type 1
+group Fe type 2
+group Cr type 3
+
+create_atoms 1 box
+
+set type 1 type/fraction 2 0.2 12345
+set type 1 type/fraction 3 0.05 54321
+
+fix 1 all nvt temp 300.0 300.0 $(25.0*dt)
+
+timestep    0.001
+thermo 200
+
+dump traj all xyz 1 out.xyz
+dump_modify traj element Ni Fe Cr
+
+run 1

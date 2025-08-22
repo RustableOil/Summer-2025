@@ -1,0 +1,51 @@
+variable        T equal ${temp}
+variable        I equal ${index}
+variable        seed equal ${index}
+variable        every equal 1000
+
+dimension       3
+
+units           metal
+boundary        p p p
+atom_style      atomic
+neighbor        2 bin
+
+lattice         fcc 3.52
+
+variable        S equal ${size}
+variable        Smid equal (${size}/2)
+variable        Smod equal (${size}/2+0.5)
+
+region          box block 0 ${S} 0 ${S} 0 ${S}
+create_box      1 box
+
+mass            1 58.69
+
+pair_style      eam/alloy
+pair_coeff      * * FeNiCr_ArturV3.eam Ni
+
+create_atoms    1 box
+create_atoms    1 single  ${Smid} ${Smod} ${Smid}
+
+group           Ni type 1
+
+velocity        all create $T ${seed}
+
+fix             1 all npt temp $T $T 5 iso 0 0 10
+
+thermo          1000
+
+timestep        0.001
+
+run             50000
+
+compute         msd_Ni Ni msd
+variable        msd_Ni_ equal c_msd_Ni[4]
+fix             msdout all print ${every} "${msd_Ni_}" file ./Ni/$I_msd_Ni_$T.txt screen no
+
+variable        pe equal pe
+fix             peout all print ${every} "${pe}" file ./Ni/$I_pe_$T.txt screen no
+
+thermo_style    custom step temp pe c_msd_Ni[4]
+
+run             500000

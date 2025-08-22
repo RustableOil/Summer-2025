@@ -1,0 +1,51 @@
+dimension       3
+
+units           metal
+boundary        p p p
+atom_style      atomic
+neighbor        2 bin
+
+lattice         fcc 3.52
+
+variable        S equal ${size}
+variable        Smid equal (${size}/2)
+variable        Smod equal (${size}/2+0.5)
+
+region          box block 0 ${S} 0 ${S} 0 ${S}
+create_box      3 box
+
+mass            1 58.69
+mass            2 55.85
+mass            3 52.00
+
+pair_style      eam/alloy
+pair_coeff      * * FeNiCr_ArturV3.eam Ni Fe Cr
+
+create_atoms    1 box
+create_atoms    1 single  ${Smid} ${Smod} ${Smid}
+
+set             type 1 type/fraction 2 0.10 12345
+set             type 1 type/fraction 3 0.18 54321
+
+variable        every equal 1000
+
+variable        T equal ${temp}
+variable        I equal ${index}
+
+velocity        all create $T $I
+
+fix             1 all npt temp $T $T 5 iso 0 0 10
+
+compute         msd all msd
+fix             msdout all ave/time ${every} 1 ${every} c_msd[4] file ./NiFeCr/$I_msd_$T.txt
+
+thermo          1000
+thermo_style    custom step temp press c_msd[4]
+
+dump            2 all custom 50000 ./NiFeCr/$I_out_$T.custom element type id x y z
+dump_modify     2 element Ni Fe Cr
+dump_modify     2 format line "%s %d %d %.2f %.2f %.2f"
+
+timestep        0.001
+
+run             500000

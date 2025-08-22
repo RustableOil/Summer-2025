@@ -1,0 +1,42 @@
+dimension       3
+
+units           metal
+boundary        p p p
+atom_style      atomic
+neighbor        2 bin
+
+lattice         fcc 3.52
+
+variable        S equal ${size}
+variable        Smid equal (${size}/2)
+variable        Smod equal (${size}/2+0.5)
+
+region          box block 0 ${S} 0 ${S} 0 ${S}
+create_box      1 box
+
+mass            1 58.69
+
+pair_style      eam/alloy
+pair_coeff      * * Ni_v6_2.0_LKBeland2016.eam Ni
+
+create_atoms    1 box
+create_atoms    1 single  ${Smid} ${Smod} ${Smid}
+
+variable        every equal 1000
+
+variable        T equal ${temp}
+variable        I equal ${index}
+
+velocity        all create $T $I
+
+fix             1 all npt temp $T $T 5 iso 0 0 100
+
+compute         msd all msd
+fix             msdout all ave/time ${every} 1 ${every} c_msd[4] file ./Ni/$I_msd_$T.txt
+
+thermo          1000
+thermo_style    custom step temp press c_msd[4]
+
+timestep        0.001
+
+run             5000000
